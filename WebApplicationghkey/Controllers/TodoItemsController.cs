@@ -78,14 +78,7 @@ namespace WebApplicationghkey.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                //if (!TodoItemExists(id))
-                //{
-                //    return NotFound();
-                //}
-                //else
-                //{
-                //    throw;
-                //}
+
             }
 
             return NoContent();
