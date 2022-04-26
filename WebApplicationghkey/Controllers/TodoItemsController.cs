@@ -83,24 +83,7 @@ namespace WebApplicationghkey.Controllers
 
             return NoContent();
         }
-        [HttpGet]
-        public ActionResult<IEnumerable<TodoItem>>
-            AllTodoItem(bool? complitfilter)   //? nullable اکر نبود جواب درستی نمی داد
-        {
-            var query = _context.TodoItems.AsQueryable();
-
-            if (complitfilter != null)
-            {
-                query = query.Where(f => f.IsComplete == complitfilter);
-            }
-
-            query = query.OrderByDescending(x => x.Id);
-
-            var todoItems = query.AsEnumerable();
-            return Ok(todoItems);
-        }
-
-
+       
         [HttpPost]
         public IActionResult AddMultiTodoItem(IEnumerable<TodoItem> todoItems)
         {
@@ -114,16 +97,41 @@ namespace WebApplicationghkey.Controllers
         [HttpDelete]
         public IActionResult DeletMultiTodoItem(List<long> IDs)
         {
-            var todoitems= _context.TodoItems.Where(i => IDs.Contains(i.Id));
+            var todoitems = _context.TodoItems.Where(i => IDs.Contains(i.Id));
             _context.TodoItems.RemoveRange(todoitems);
             _context.SaveChangesAsync();
 
             return Ok();
         }
 
+        [HttpGet]
+        public ActionResult<IEnumerable<TodoItem>>
+        FilterItem(string Name, bool? complitfilter)
+        {
+            var query = _context.TodoItems.AsQueryable();
 
+            if (Name != null)
+            {
+                query = query.Where(f => f.Name.Contains(Name) );
+
+            }
+            if (complitfilter != null)
+            {
+                query = query.Where(f => f.IsComplete == complitfilter);
+
+            }
+            query = query.OrderByDescending(x => x.Id);
+
+            var todoItems = query.AsEnumerable();
+            return Ok(todoItems);
+
+
+        }
     }
 
 
-
 }
+
+
+
+
