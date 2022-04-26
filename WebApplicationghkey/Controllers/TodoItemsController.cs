@@ -112,14 +112,16 @@ namespace WebApplicationghkey.Controllers
 
 
         [HttpDelete]
-        public ActionResult<IEnumerable<TodoItem>>
-        DeletMultiTodoItem(bool complitfilter)
+        public IActionResult DeletMultiTodoItem(List<long> IDs)
         {
-            List<TodoItem> multipletodoitems =
-                new List<TodoItem>();
-            multipletodoitems.Add(new TodoItem { });
-            return Ok(multipletodoitems);
+            var todoitems= _context.TodoItems.Where(i => IDs.Contains(i.Id));
+            _context.TodoItems.RemoveRange(todoitems);
+            _context.SaveChangesAsync();
+
+            return Ok();
         }
+
+
     }
 
 
