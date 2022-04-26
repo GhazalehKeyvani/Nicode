@@ -26,7 +26,7 @@ namespace WebApplicationghkey.Controllers
 
         [HttpPost]
         public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
-         {
+        {
             _context.TodoItems.Add(todoItem);
             await _context.SaveChangesAsync();
 
@@ -85,14 +85,40 @@ namespace WebApplicationghkey.Controllers
         }
         [HttpGet]
         public ActionResult<IEnumerable<TodoItem>>
-            AllTodoItem(bool complitfilter)
+            AllTodoItem(bool? complitfilter)   //? nullable اکر نبود جواب درستی نمی داد
         {
-            var todoItems = _context.TodoItems
-                .Where(f => f.IsComplete==complitfilter)
-                .OrderByDescending(x=>x.Id)
-                .ToList();
-      
+            var query = _context.TodoItems.AsQueryable();
+
+            if (complitfilter != null)
+            {
+                query = query.Where(f => f.IsComplete == complitfilter);
+            }
+
+            query = query.OrderByDescending(x => x.Id);
+
+            var todoItems = query.AsEnumerable();
             return Ok(todoItems);
+        }
+
+
+        [HttpPost]
+        public IActionResult AddMultiTodoItem(IEnumerable<TodoItem> todoItems)
+        {
+
+            _context.TodoItems.AddRange(todoItems);
+            _context.SaveChangesAsync();
+            return Ok();
+        }
+
+
+        [HttpDelete]
+        public ActionResult<IEnumerable<TodoItem>>
+        DeletMultiTodoItem(bool complitfilter)
+        {
+            List<TodoItem> multipletodoitems =
+                new List<TodoItem>();
+            multipletodoitems.Add(new TodoItem { });
+            return Ok(multipletodoitems);
         }
     }
 
