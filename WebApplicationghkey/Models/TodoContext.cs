@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using WebApplicationghkey.Controllers;
+using WebApplicationghkey.Models;
 
 namespace WebApplicationghkey
 {
@@ -13,6 +14,7 @@ namespace WebApplicationghkey
         {
         }
         public virtual DbSet<TodoItem> TodoItems { get; set; }
+        public virtual DbSet<Category> CategoryItems { get; set; }
 
     }
     
