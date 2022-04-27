@@ -24,8 +24,16 @@ namespace WebApplicationghkey.Controllers
         [Route("api/[controller]")]
 
         [HttpPost]
-        public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem todoItem)
+        public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItemDto dto)
         {
+
+            var todoItem = new TodoItem
+            {
+                CategoryId = dto.CategoryId,
+                Name = dto.Name,
+                Id = dto.Id,
+                IsComplete = dto.IsComplete
+            };
 
             _context.TodoItems.Add(todoItem);
             await _context.SaveChangesAsync();
@@ -35,16 +43,23 @@ namespace WebApplicationghkey.Controllers
         }
         // GET: api/TodoItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
+        public async Task<ActionResult<TodoItem>> GetTodoItem(TodoItemDto dto)
         {
-            var todoItem = await _context.TodoItems.FindAsync(id);
+            var todoItem = new TodoItem
+            {
+                CategoryId = dto.CategoryId,
+                Name = dto.Name,
+                Id = dto.Id,
+                IsComplete = dto.IsComplete
+            };
+            var todoItemfind = await _context.TodoItems.FindAsync(dto.Id);
 
-            if (todoItem == null)
+            if (todoItemfind == null)
             {
                 return NotFound();
             }
 
-            return todoItem;
+            return todoItemfind;
         }
         // DELETE: api/TodoItems/5
         [HttpDelete("{id}")]
@@ -95,7 +110,7 @@ namespace WebApplicationghkey.Controllers
 
 
         [HttpDelete]
-        public IActionResult DeletMultiTodoItem(List<long> IDs)
+        public IActionResult DeleteMultiTodoItem(List<long> IDs)
         {
             var todoitems = _context.TodoItems.Where(i => IDs.Contains(i.Id));
             _context.TodoItems.RemoveRange(todoitems);
@@ -124,8 +139,6 @@ namespace WebApplicationghkey.Controllers
 
             var todoItems = query.AsEnumerable();
             return Ok(todoItems);
-
-
         }
     }
 
