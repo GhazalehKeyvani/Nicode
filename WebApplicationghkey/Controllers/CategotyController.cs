@@ -11,6 +11,8 @@ using WebApplicationghkey.Test;
 
 namespace WebApplicationghkey.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class CategotyController : Controller
     {
         private readonly TodoContext _context;
@@ -19,7 +21,7 @@ namespace WebApplicationghkey.Controllers
             _context = context;
         }
         [HttpPost]
-        public IActionResult PostCategory(Category dto)
+        public IActionResult PostCategory(CategoryDto dto)
         {
             var categoryItem = new Category
             {
@@ -30,43 +32,55 @@ namespace WebApplicationghkey.Controllers
 
             _context.CategoryItems.Add(categoryItem);
             _context.SaveChanges();
-            return View();
+            return Ok();
         }
         [HttpGet]
-        public ActionResult<IEnumerable<Category>> GetCategory(CategoryDto dto)
+        public ActionResult<IEnumerable<Category>> GetCategories(string name, int order )
         {
-            var categoryItem = new Category
-            {
-                Id = dto.Id,
-                Name = dto.Name,
-                Order = dto.Order
-            };
+
             var query = _context.CategoryItems.AsQueryable();
 
-            if (dto.Name != null)
+            if (name != null)
             {
-                query=query.Where(x => x.Name.Contains(dto.Name));
+                query=query.Where(x => x.Name.Contains(name));
+                query=query.Where(x => x.Order.Equals(order));
             }
-            query = query.OrderBy(x => x.Order);
-            
+            query = query.OrderBy(o => o.Id);
             var categories = query.AsEnumerable();
-            return View(categories);
+            return Ok(categories);
+
+        }
+        [HttpGet("{id}")]
+        public IActionResult GetCategory(long id)
+        {
+
+            var category = _context.CategoryItems.Find(id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(category);
 
         }
         [HttpDelete]
-        public ActionResult<IEnumerable<Category>> DeleteCategory(CategoryDto dto)
+        public IActionResult DeleteCategory(long id)
         {
-            var categoryItem = new Category
-            {
-                Id = dto.Id,
-                Name = dto.Name,
-                Order = dto.Order
-            };
             //MyTestClass.Add("lss", "sdfs");
-            var categoryid=_context.CategoryItems.Find(dto.Id);
+            var categoryid=_context.CategoryItems.Find(id);
             _context.CategoryItems.Remove(categoryid);
             _context.SaveChanges();
-            return View() ;
+            return Ok() ;
+        }
+        [HttpPut]
+        public IActionResult UpDateCategory(CategoryDto dto)
+        {
+            //MyTestClass.Add("lss", "sdfs");
+            var categoryid = _context.CategoryItems.Find(id);
+            _context.CategoryItems.Update(categoryid);
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }

@@ -32,7 +32,7 @@ namespace WebApplicationghkey.Controllers
                 CategoryId = dto.CategoryId,
                 Name = dto.Name,
                 Id = dto.Id,
-                IsComplete = dto.IsComplete
+                IsComplete                                                                                                                                                                                                             = dto.IsComplete
             };
 
             _context.TodoItems.Add(todoItem);
@@ -43,16 +43,10 @@ namespace WebApplicationghkey.Controllers
         }
         // GET: api/TodoItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItem>> GetTodoItem(TodoItemDto dto)
+        public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
         {
-            var todoItem = new TodoItem
-            {
-                CategoryId = dto.CategoryId,
-                Name = dto.Name,
-                Id = dto.Id,
-                IsComplete = dto.IsComplete
-            };
-            var todoItemfind = await _context.TodoItems.FindAsync(dto.Id);
+            
+            var todoItemfind = await _context.TodoItems.FindAsync(id);
 
             if (todoItemfind == null)
             {
@@ -78,14 +72,15 @@ namespace WebApplicationghkey.Controllers
         }
         // PUT: api/TodoItems/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTodoItem(long id, TodoItem todoItem)
+        public async Task<IActionResult> PutTodoItem(long id, TodoItemDto dto)
         {
-            if (id != todoItem.Id)
+            if (id != dto.Id)
             {
-                return BadRequest();
+                return BadRequest();      // errore 400
             }
 
-            _context.Entry(todoItem).State = EntityState.Modified;
+            //_context.TodoItems.Update(entity);
+            //_context.Entry(entity).State = EntityState.Modified;                 with entity
 
             try
             {
@@ -96,12 +91,21 @@ namespace WebApplicationghkey.Controllers
 
             }
 
-            return NoContent();
+            return NoContent();     // 201 it's an event action
         }
        
         [HttpPost]
-        public IActionResult AddMultiTodoItem(IEnumerable<TodoItem> todoItems)
+        public IActionResult AddMultiTodoItem(IEnumerable<TodoItemDto> items)
         {
+            var todoItems = items.Select(dto => new TodoItem
+            {
+                CategoryId = dto.CategoryId,
+                Name = dto.Name,
+                Id = dto.Id,
+                IsComplete = dto.IsComplete
+            })
+                .ToList();
+
 
             _context.TodoItems.AddRange(todoItems);
             _context.SaveChangesAsync();
@@ -112,6 +116,7 @@ namespace WebApplicationghkey.Controllers
         [HttpDelete]
         public IActionResult DeleteMultiTodoItem(List<long> IDs)
         {
+
             var todoitems = _context.TodoItems.Where(i => IDs.Contains(i.Id));
             _context.TodoItems.RemoveRange(todoitems);
             _context.SaveChangesAsync();
@@ -138,12 +143,12 @@ namespace WebApplicationghkey.Controllers
             query = query.OrderByDescending(x => x.Id);
 
             var todoItems = query.AsEnumerable();
-            return Ok(todoItems);
+            return Ok(todoItems);  
         }
     }
 
 
-
+    
 }
 
 
