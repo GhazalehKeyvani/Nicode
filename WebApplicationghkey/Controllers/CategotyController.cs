@@ -35,25 +35,30 @@ namespace WebApplicationghkey.Controllers
             return Ok();
         }
         [HttpGet]
-        public ActionResult<IEnumerable<Category>> GetCategories(string name, int order )
+        public ActionResult<IEnumerable<CategoryDto>> GetCategories(string name, int order)
         {
 
             var query = _context.CategoryItems.AsQueryable();
 
             if (name != null)
             {
-                query=query.Where(x => x.Name.Contains(name));
-                query=query.Where(x => x.Order.Equals(order));
+                query = query.Where(x => x.Name.Contains(name));
+                query = query.Where(x => x.Order.Equals(order));
             }
+            //var categoryDto = new CategoryDto
+            //{
+            //    Id = query.Id,
+            //    Name = query.Name,
+            //    Order = query.Order
+            //};
             query = query.OrderBy(o => o.Id);
             var categories = query.AsEnumerable();
             return Ok(categories);
 
         }
         [HttpGet("{id}")]
-        public IActionResult GetCategory(long id)
+        public ActionResult<CategoryDto> GetCategory(long id)
         {
-
             var category = _context.CategoryItems.Find(id);
 
             if (category == null)
@@ -61,24 +66,47 @@ namespace WebApplicationghkey.Controllers
                 return NotFound();
             }
 
-            return Ok(category);
+            var result = new CategoryDto
+            {
+                Id = id,
+                Name = category.Name,
+                Order = category.Order
+            };
+
+            return Ok(result);
 
         }
         [HttpDelete]
         public IActionResult DeleteCategory(long id)
         {
             //MyTestClass.Add("lss", "sdfs");
-            var categoryid=_context.CategoryItems.Find(id);
+            var categoryid = _context.CategoryItems.Find(id);
             _context.CategoryItems.Remove(categoryid);
             _context.SaveChanges();
-            return Ok() ;
+            return Ok();
         }
         [HttpPut]
-        public IActionResult UpDateCategory(CategoryDto dto)
+        public IActionResult UpDateCategory(CategoryDto dto, long id)
         {
             //MyTestClass.Add("lss", "sdfs");
-            var categoryid = _context.CategoryItems.Find(id);
-            _context.CategoryItems.Update(categoryid);
+            //var category = _context.CategoryItems.Find();
+            var category = _context.CategoryItems
+                //.AsNoTracking()                           *******for getting
+                .Where(x => x.Id == id)
+                .FirstOrDefault();     //
+
+            if (category == null)
+            {
+                NotFound();
+            }
+
+            category.Name = dto.Name;
+            category.Order = dto.Order;
+
+            //_context.CategoryItems.Update(category);              ********
+
+
+
             _context.SaveChanges();
             return Ok();
         }

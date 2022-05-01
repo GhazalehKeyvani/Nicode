@@ -43,10 +43,15 @@ namespace WebApplicationghkey.Controllers
         }
         // GET: api/TodoItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
+        public async Task<ActionResult<TodoItem>> GetTodoItem(long id, TodoItemDto dto)
         {
-            
-            var todoItemfind = await _context.TodoItems.FindAsync(id);
+            var todoItemDto = new TodoItemDto
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                IsComplete = dto.IsComplete
+            };
+            var todoItemfind = await _context.TodoItems.FindAsync(dto.Id);
 
             if (todoItemfind == null)
             {
@@ -125,10 +130,11 @@ namespace WebApplicationghkey.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<TodoItem>>
+        public ActionResult<IEnumerable<TodoItemDto>>
         FilterItem(string Name, bool? complitfilter)
         {
             var query = _context.TodoItems.AsQueryable();
+
 
             if (Name != null)
             {
