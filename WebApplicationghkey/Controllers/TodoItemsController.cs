@@ -29,7 +29,6 @@ namespace WebApplicationghkey.Controllers
 
             var todoItem = new TodoItem
             {
-                CategoryId = dto.CategoryId,
                 Name = dto.Name,
                 Id = dto.Id,
                 IsComplete                                                                                                                                                                                                             = dto.IsComplete
@@ -43,22 +42,22 @@ namespace WebApplicationghkey.Controllers
         }
         // GET: api/TodoItems/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TodoItem>> GetTodoItem(long id, TodoItemDto dto)
+        public async Task<ActionResult<TodoItemWithCategoryDto>> GetTodoItem(long id)
         {
-            var todoItemDto = new TodoItemDto
-            {
-                Id = dto.Id,
-                Name = dto.Name,
-                IsComplete = dto.IsComplete
-            };
-            var todoItemfind = await _context.TodoItems.FindAsync(dto.Id);
-
+            var todoItemfind = await _context.TodoItems.FindAsync(id);
             if (todoItemfind == null)
             {
                 return NotFound();
             }
+            var todoItemDto = new TodoItemDto
+            {
+                Id = id,
+                Name = todoItemfind.Name,
+                IsComplete = todoItemfind.IsComplete
+            };
 
-            return todoItemfind;
+
+            return Ok(todoItemDto);
         }
         // DELETE: api/TodoItems/5
         [HttpDelete("{id}")]
@@ -130,26 +129,24 @@ namespace WebApplicationghkey.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<TodoItemDto>>
+        public ActionResult<IEnumerable<TodoItemWithCategoryDto>>
         FilterItem(string Name, bool? complitfilter)
         {
-            var query = _context.TodoItems.AsQueryable();
-
-
-            if (Name != null)
-            {
-                query = query.Where(f => f.Name.Contains(Name) );
-
-            }
-            if (complitfilter != null)
-            {
-                query = query.Where(f => f.IsComplete == complitfilter);
-
-            }
-            query = query.OrderByDescending(x => x.Id);
+            var query = _context.TodoItems
+                .Include(p => p.Category)
+                .Where(f => (Name == null || f.Name.Contains(Name)) && (complitfilter == null || f.IsComplete == complitfilter))
+                .OrderByDescending(x => x.Id);
 
             var todoItems = query.AsEnumerable();
-            return Ok(todoItems);  
+            var todoItem = todoItems.Select(dto => new TodoItemWithCategoryDto
+            {
+                Id =dto.Id  ,
+                Name = dto.Name,
+                IsComplete = dto.IsComplete
+
+            }).ToList();
+
+            return Ok(todoItem);  
         }
     }
 

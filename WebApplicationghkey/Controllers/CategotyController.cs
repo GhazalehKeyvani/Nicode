@@ -38,20 +38,15 @@ namespace WebApplicationghkey.Controllers
         public ActionResult<IEnumerable<CategoryDto>> GetCategories(string name, int order)
         {
 
-            var query = _context.CategoryItems.AsQueryable();
-
-            if (name != null)
-            {
-                query = query.Where(x => x.Name.Contains(name));
-                query = query.Where(x => x.Order.Equals(order));
-            }
+            var query = _context.CategoryItems.Where(x =>(name == null || x.Name.Contains(name)) && (order == null || x.Order==order));
+            
             //var categoryDto = new CategoryDto
             //{
             //    Id = query.Id,
             //    Name = query.Name,
             //    Order = query.Order
             //};
-            query = query.OrderBy(o => o.Id);
+            
             var categories = query.AsEnumerable();
             return Ok(categories);
 
