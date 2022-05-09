@@ -17,12 +17,11 @@ namespace WebApplicationghkey
         }
         public virtual DbSet<TodoItem> TodoItems { get; set; }
         public virtual DbSet<Category> CategoryItems { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer(@"Server=.\SQL;Database=TodoItemsDB;Trusted_Connection=True;");
-            }
+            modelBuilder.Entity<Category>().ToTable("Category");
+            modelBuilder.Entity<TodoItem>().ToTable("TodoItem");
         }
     } 
 }
