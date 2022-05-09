@@ -9,8 +9,8 @@ using WebApplicationghkey;
 namespace WebApplicationghkey.Migrations
 {
     [DbContext(typeof(TodoContext))]
-    [Migration("20220507085047_init")]
-    partial class init
+    [Migration("20220509095846_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,7 +28,9 @@ namespace WebApplicationghkey.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(22)
+                        .HasColumnType("nvarchar(22)");
 
                     b.Property<int>("Order")
                         .HasColumnType("int");
@@ -52,7 +54,9 @@ namespace WebApplicationghkey.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(22)
+                        .HasColumnType("nvarchar(22)");
 
                     b.HasKey("Id");
 
